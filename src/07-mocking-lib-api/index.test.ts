@@ -20,42 +20,33 @@ const mockData: MockData = {
     'reprehenderit molestiae ut ut quas totam\n' +
     'nostrum rerum est autem sunt rem eveniet architecto',
 };
-
-// const mockedAxios = axios as jest.Mocked<typeof axios>;
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 jest.mock('axios');
 
 describe('throttledGetDataFromApi', () => {
   beforeEach(() => {
-    mockedAxios.create.mockReturnThis();
-    mockedAxios.get.mockImplementationOnce(() => {
-      return Promise.resolve({
-        data: {
-          data: mockData,
-          config: {
-            baseURL: 'https://jsonplaceholder.typicode.com/',
-            url: 'posts/1',
-          },
-        },
-      });
-    });
+    mockedAxios.create = jest.fn(() => mockedAxios);
+    mockedAxios.get.mockImplementationOnce((path) =>
+      Promise.resolve({ data: { data: mockData, url: path } }),
+    );
   });
 
   test('should create instance with provided base url', async () => {
     await throttledGetDataFromApi('posts/1');
-    expect(mockedAxios.create).toHaveBeenCalledTimes(1);
+
+    expect(mockedAxios.create).toHaveBeenCalledWith({
+      baseURL: 'https://jsonplaceholder.typicode.com',
+    });
   });
 
   test('should perform request to correct provided url', async () => {
     const res = await throttledGetDataFromApi('posts/1');
-    console.log(res);
-    expect(res.config.baseURL + res.config.url).toEqual(
-      'https://jsonplaceholder.typicode.com/posts/1',
-    );
+    expect(res.url).toEqual('posts/1');
   });
 
   test('should return response data', async () => {
     const res = await throttledGetDataFromApi('posts/1');
+
     expect(res.data).toEqual(mockData);
   });
 });
