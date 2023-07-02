@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { throttle } from 'lodash';
 
-export const THROTTLE_TIME = 5000;
+export const THROTTLE_TIME = 500;
 
 const getDataFromApi = async (relativePath: string) => {
   const axiosClient = axios.create({
@@ -9,6 +9,7 @@ const getDataFromApi = async (relativePath: string) => {
   });
 
   const response = await axiosClient.get(relativePath);
+
   return response.data;
 };
 
