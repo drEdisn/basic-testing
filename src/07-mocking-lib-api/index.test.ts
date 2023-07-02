@@ -25,10 +25,15 @@ jest.mock('axios');
 
 describe('throttledGetDataFromApi', () => {
   beforeEach(() => {
+    jest.useFakeTimers();
     mockedAxios.create = jest.fn(() => mockedAxios);
     mockedAxios.get.mockImplementationOnce((path) =>
       Promise.resolve({ data: { data: mockData, url: path } }),
     );
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
   });
 
   test('should create instance with provided base url', async () => {
